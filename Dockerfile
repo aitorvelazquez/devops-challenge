@@ -9,8 +9,8 @@ RUN go mod download
 
 COPY ./test-app/cmd/ops-test-app/main.go ./
 
-RUN go build -o /docker-test-app
+RUN go build -o /test-app
 
 EXPOSE 8080
 
-CMD [ "/docker-test-app" ]
+CMD [ "/test-app" ]
