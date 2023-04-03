@@ -1,4 +1,4 @@
-name: 'Terraform CI'
+name: 'Terraform Infrastructure actions'
 
 on:
   push:
