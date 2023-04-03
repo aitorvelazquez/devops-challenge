@@ -3,6 +3,16 @@ variable "project_name" {
   default = "devops-challenge"
 }
 
+variable "app_name" {
+  type    = string
+  default = "test-app"
+}
+
+variable "app_version" {
+  type    = string
+  default = "latest"
+}
+
 variable "gcp_pg_name" {
   type    = string
   default = "pg-instance"

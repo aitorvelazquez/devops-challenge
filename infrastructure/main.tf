@@ -17,6 +17,14 @@ resource "google_compute_network" "vpc_devops-challenge" {
   project  = var.gcp_project_id
 }
 
+# Create a Artifact REgistry to store our app image
+resource "google_artifact_registry_repository" "devops-challenge" {
+  location      = var.gcp_region
+  repository_id = "${var.project_name}"
+  description   = "Artifact Repository for ${var.gcp_project_name}"
+  format        = "DOCKER"
+}
+
 # Create a private IP address 
 resource "google_compute_global_address" "private_ip_address" {
   provider      = google
@@ -63,7 +71,7 @@ module "serverless-connector" {
 
 # Create the Cloud Run service to run our app
 resource "google_cloud_run_service" "test-app-devops-challenge" {
-  name     = "test-app"
+  name     = "test-app-${var.project_name}"
   location = var.gcp_region
 
   template {
@@ -79,7 +87,7 @@ resource "google_cloud_run_service" "test-app-devops-challenge" {
     }
     spec {
       containers {
-        image = "us-central1-docker.pkg.dev/inbound-descent-382406/devops-challenge/test-app:1.0"
+        image = "${var.gcp_region}-docker.pkg.dev/${var.gcp_project_id}/${var.project_name}/${var.app_name}:${var.app_version}"
         # Environment variables to define Database details
         env {
           name  = "POSTGRESQL_HOST"
