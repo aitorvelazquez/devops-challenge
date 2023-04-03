@@ -2,7 +2,7 @@ FROM golang:1.16-alpine
 
 WORKDIR /app
 
-# Download the GO modules
+# Downloading the GO modules
 COPY ./test-app/go.mod ./
 COPY ./test-app/go.sum ./
 RUN go mod download
