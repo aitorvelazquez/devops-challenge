@@ -1,11 +1,11 @@
 # Local .terraform directories
-./infrastructure/.terraform/*
+/infrastructure/.terraform/*
 /infrastructure/.terraform
 
 
 # .tfstate files
-./infrastructure/*.tfstate
-./infrastructure/*.tfstate.*
+/infrastructure/*.tfstate
+/infrastructure/*.tfstate.*
 
 # terraform dependency lock file
-./infrastructure/.terraform.lock.hcl
+/infrastructure/.terraform.lock.hcl

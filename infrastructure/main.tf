@@ -50,7 +50,7 @@ module "serverless-connector" {
   version    = "~> 6.0"
   project_id = var.gcp_project_id
   vpc_connectors = [{
-    name          = "central-serverless-${var.project_name}"
+    name          = "vpc-ac-${var.project_name}"
     region        = var.gcp_region
     subnet_name   = google_compute_subnetwork.vpc-subnet.name
     machine_type  = "e2-micro"
@@ -58,7 +58,7 @@ module "serverless-connector" {
     max_instances = 3
     }
   ]
-  depends_on = [google_project_service.vpcaccess-api]
+  depends_on = [google_project_service.enable_vpcaccess-api]
 }
 
 # Create the Cloud Run service to run our app
@@ -72,7 +72,7 @@ resource "google_cloud_run_service" "test-app-devops-challenge" {
         # Limit scale up to prevent any cost blow outs!
         "autoscaling.knative.dev/maxScale" = "2"
         # Use the VPC Connector
-        "run.googleapis.com/vpc-access-connector" = "central-serverless"
+        "run.googleapis.com/vpc-access-connector" = "vpc-ac-${var.project_name}"
         # all egress from the service should go through the VPC Connector
         "run.googleapis.com/vpc-access-egress" = "all-traffic"
       }
@@ -85,6 +85,14 @@ resource "google_cloud_run_service" "test-app-devops-challenge" {
           name  = "POSTGRESQL_HOST"
           value = google_sql_database_instance.gcp_sql_postgres.private_ip_address
         }
+        env {
+          name  = "POSTGRESQL_USER"
+          value = google_sql_user.user.name
+        }
+        env {
+          name  = "POSTGRESQL_PASSWORD"
+          value = google_sql_user.user.password
+        }
       }
     }
   }
@@ -95,7 +103,7 @@ resource "google_cloud_run_service" "test-app-devops-challenge" {
   }
 
   # Waits for the Cloud Run API, Postgres Instance and VPC Connector to be enabled
-  depends_on = [google_project_service.run_api, google_sql_database_instance.gcp_sql_postgres, module.serverless-connector]
+  depends_on = [google_project_service.enable_run_api, google_sql_database_instance.gcp_sql_postgres, module.serverless-connector]
 }
 
 
@@ -117,6 +125,12 @@ resource "google_sql_database_instance" "gcp_sql_postgres" {
       enable_private_path_for_google_cloud_services = true
     }
   }
+}
+
+resource "google_sql_user" "user" {
+  name     = "db-test-app-user"
+  instance = google_sql_database_instance.gcp_sql_postgres.name
+  password = "devopschallenge-042023"
 }
 
 # Allow unauthenticated users to invoke the service
