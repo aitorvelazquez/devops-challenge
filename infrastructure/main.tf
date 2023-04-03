@@ -1,17 +1,68 @@
 ### Cloud Run enabling
-resource "google_project_service" "run_api" {
+resource "google_project_service" "enable_run_api" {
   service            = "run.googleapis.com"
   disable_on_destroy = true
 }
 
 # Enable VPC connector
-resource "google_project_service" "vpcaccess-api" {
+resource "google_project_service" "enable_vpcaccess-api" {
   project = var.gcp_project_id
   service = "vpcaccess.googleapis.com"
 }
 
-# Create the Cloud Run service
-resource "google_cloud_run_service" "test-app" {
+# Create a VPC network
+resource "google_compute_network" "vpc_devops-challenge" {
+  provider = google
+  name     = "vpc-${var.project_name}"
+  project  = var.gcp_project_id
+}
+
+# Create a private IP address 
+resource "google_compute_global_address" "private_ip_address" {
+  provider      = google
+  project       = var.gcp_project_id
+  name          = "private-ip-address-${var.project_name}"
+  purpose       = "VPC_PEERING"
+  address_type  = "INTERNAL"
+  prefix_length = 16
+  network       = google_compute_network.vpc_devops-challenge.id
+}
+
+# Create a private connection
+resource "google_service_networking_connection" "private_vpc_connection" {
+  provider                = google
+  network                 = google_compute_network.vpc_devops-challenge.id
+  service                 = "servicenetworking.googleapis.com"
+  reserved_peering_ranges = [google_compute_global_address.private_ip_address.name]
+}
+
+# Create a subnet within the VPC
+resource "google_compute_subnetwork" "vpc-subnet" {
+  name          = "subnet-${var.project_name}"
+  ip_cidr_range = "10.2.0.0/28" # Required mask by the VPC serverless connector
+  region        = var.gcp_region
+  network       = google_compute_network.vpc_devops-challenge.id
+}
+
+# Allow the cloudrun resource (test-app) to connect to the VPC subnet
+module "serverless-connector" {
+  source     = "terraform-google-modules/network/google//modules/vpc-serverless-connector-beta"
+  version    = "~> 6.0"
+  project_id = var.gcp_project_id
+  vpc_connectors = [{
+    name          = "central-serverless-${var.project_name}"
+    region        = var.gcp_region
+    subnet_name   = google_compute_subnetwork.vpc-subnet.name
+    machine_type  = "e2-micro"
+    min_instances = 2
+    max_instances = 3
+    }
+  ]
+  depends_on = [google_project_service.vpcaccess-api]
+}
+
+# Create the Cloud Run service to run our app
+resource "google_cloud_run_service" "test-app-devops-challenge" {
   name     = "test-app"
   location = var.gcp_region
 
@@ -34,14 +85,6 @@ resource "google_cloud_run_service" "test-app" {
           name  = "POSTGRESQL_HOST"
           value = google_sql_database_instance.gcp_sql_postgres.private_ip_address
         }
-        env {
-          name  = "POSTGRESQL_USER"
-          value = google_sql_user.user.name
-        }
-        env {
-          name  = "POSTGRESQL_PASSWORD"
-          value = google_sql_user.user.password
-        }
       }
     }
   }
@@ -56,57 +99,11 @@ resource "google_cloud_run_service" "test-app" {
 }
 
 
-resource "google_compute_network" "private_network" {
-  provider = google-beta
-  name     = "private-network"
-  project  = var.gcp_project_id
-}
-
-resource "google_compute_global_address" "private_ip_address" {
-  provider      = google-beta
-  project       = var.gcp_project_id
-  name          = "private-ip-address"
-  purpose       = "VPC_PEERING"
-  address_type  = "INTERNAL"
-  prefix_length = 16
-  network       = google_compute_network.private_network.id
-}
-
-resource "google_service_networking_connection" "private_vpc_connection" {
-  provider                = google-beta
-  network                 = google_compute_network.private_network.id
-  service                 = "servicenetworking.googleapis.com"
-  reserved_peering_ranges = [google_compute_global_address.private_ip_address.name]
-}
-
-resource "google_compute_subnetwork" "vpc-subnet" {
-  name          = "devops-challenge-subnet"
-  ip_cidr_range = "10.2.0.0/28"
-  region        = var.gcp_region
-  network       = google_compute_network.private_network.id
-}
-
-module "serverless-connector" {
-  source     = "terraform-google-modules/network/google//modules/vpc-serverless-connector-beta"
-  version    = "~> 6.0"
-  project_id = var.gcp_project_id
-  vpc_connectors = [{
-    name          = "central-serverless"
-    region        = var.gcp_region
-    subnet_name   = google_compute_subnetwork.vpc-subnet.name
-    machine_type  = "e2-micro"
-    min_instances = 2
-    max_instances = 3
-    }
-  ]
-  depends_on = [google_project_service.vpcaccess-api]
-}
-
-
+# Deploy a postgres db instance
 resource "google_sql_database_instance" "gcp_sql_postgres" {
-  provider            = google-beta
+  provider            = google
   project             = var.gcp_project_id
-  name                = "postgres-db-test-app"
+  name                = "postgres-db-test-app-${var.project_name}"
   region              = var.gcp_region
   database_version    = var.gcp_pg_database_version
   deletion_protection = "false"
@@ -116,22 +113,16 @@ resource "google_sql_database_instance" "gcp_sql_postgres" {
     tier = var.gcp_pg_tier
     ip_configuration {
       ipv4_enabled                                  = false
-      private_network                               = google_compute_network.private_network.id
+      private_network                               = google_compute_network.vpc_devops-challenge.id
       enable_private_path_for_google_cloud_services = true
     }
   }
 }
 
-resource "google_sql_user" "user" {
-  name     = "db-test-app-user"
-  instance = google_sql_database_instance.gcp_sql_postgres.name
-  password = "devopschallenge-01042023"
-}
-
 # Allow unauthenticated users to invoke the service
 resource "google_cloud_run_service_iam_member" "run_all_users" {
-  service  = google_cloud_run_service.test-app.name
-  location = google_cloud_run_service.test-app.location
+  service  = google_cloud_run_service.test-app-devops-challenge.name
+  location = google_cloud_run_service.test-app-devops-challenge.location
   role     = "roles/run.invoker"
   member   = "allUsers"
 }

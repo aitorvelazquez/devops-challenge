@@ -1,3 +1,8 @@
+variable "project_name" {
+  type    = string
+  default = "devops-challenge"
+}
+
 variable "gcp_pg_name" {
   type    = string
   default = "pg-instance"
