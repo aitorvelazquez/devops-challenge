@@ -7,7 +7,7 @@ on:
 env:
   PROJECT_ID: inbound-descent-382406
   GAR_LOCATION: europe-southwest1
-  SERVICE: YOUR_SERVICE_NAME # TODO: update Cloud Run service name
+  SERVICE: test-app
   REGION: europe-southwest1
 
 jobs:
