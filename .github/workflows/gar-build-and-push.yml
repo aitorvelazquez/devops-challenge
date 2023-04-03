@@ -3,6 +3,9 @@ name: Build and Push container to Google Artifact Registry
 on:
   push:
     branches: [ "main" ]
+    paths:
+    - test-app
+    - Dockerfile
 
 env:
   PROJECT_ID: inbound-descent-382406
