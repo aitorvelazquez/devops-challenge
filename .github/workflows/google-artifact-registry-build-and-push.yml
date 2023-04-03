@@ -7,8 +7,9 @@ on:
 env:
   PROJECT_ID: inbound-descent-382406
   GAR_LOCATION: europe-southwest1
-  SERVICE: test-app
+  SERVICE: test-app-devops-challenge
   REGION: europe-southwest1
+  APP_VERSION: latest
 
 jobs:
   deploy:
