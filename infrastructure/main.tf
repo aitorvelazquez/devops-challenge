@@ -26,16 +26,16 @@ resource "google_compute_network" "vpc_devops-challenge" {
   project  = var.gcp_project_id
 }
 
-# Create a private IP address 
-resource "google_compute_global_address" "private_ip_address" {
-  provider      = google
-  project       = var.gcp_project_id
-  name          = "private-ip-address-${var.project_name}"
-  purpose       = "VPC_PEERING"
-  address_type  = "INTERNAL"
-  prefix_length = 16
-  network       = google_compute_network.vpc_devops-challenge.id
-}
+# # Create a private IP address 
+# resource "google_compute_global_address" "private_ip_address" {
+#   provider      = google
+#   project       = var.gcp_project_id
+#   name          = "private-ip-address-${var.project_name}"
+#   purpose       = "VPC_PEERING"
+#   address_type  = "INTERNAL"
+#   prefix_length = 16
+#   network       = google_compute_network.vpc_devops-challenge.id
+# }
 
 # Create a private connection
 resource "google_service_networking_connection" "private_vpc_connection" {
