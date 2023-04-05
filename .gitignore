@@ -8,6 +8,9 @@
 # terraform dependency lock file
 .terraform.lock.hcl
 
+# Backend files
+**/**/backend.tf
+
 # Ignore Mac OS directory attributes
 .DS_Store
 

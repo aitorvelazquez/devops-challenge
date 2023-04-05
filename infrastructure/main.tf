@@ -1,4 +1,13 @@
-### Cloud Run enabling
+# Store the tf_state in GCS bucket
+data "terraform_remote_state" "foo" {
+  backend = "gcs"
+  config = {
+    bucket = "tf-state-devops-challenge"
+    prefix = "devops-challenge"
+  }
+}
+
+# Cloud Run enabling
 resource "google_project_service" "enable_run_api" {
   service            = "run.googleapis.com"
   disable_on_destroy = true
@@ -52,7 +61,7 @@ resource "google_compute_subnetwork" "vpc-subnet" {
   network       = google_compute_network.vpc_devops-challenge.id
 }
 
-# Allow the cloudrun resource (test-app) to connect to the VPC subnet
+# Allow the CloudRun resource (test-app) to connect to the VPC subnet
 module "serverless-connector" {
   source     = "terraform-google-modules/network/google//modules/vpc-serverless-connector-beta"
   version    = "~> 6.0"
@@ -118,24 +127,45 @@ resource "google_cloud_run_service" "test-app-devops-challenge" {
 }
 
 
-# Deploy a postgres db instance
+# Deploy a postgres Master db instance
 resource "google_sql_database_instance" "gcp_sql_postgres" {
   provider            = google
   project             = var.gcp_project_id
-  name                = "postgres-db-test-app-${var.project_name}"
+  name                = "postgres-db-test-app-${var.project_name}-master"
   region              = var.gcp_region
   database_version    = var.gcp_pg_database_version
   deletion_protection = "false"
   depends_on          = [google_service_networking_connection.private_vpc_connection]
 
   settings {
-    tier = var.gcp_pg_tier
+    tier              = var.gcp_pg_tier
+    availability_type = "REGIONAL"
+    disk_size         = "25"
     ip_configuration {
       ipv4_enabled                                  = false
       private_network                               = google_compute_network.vpc_devops-challenge.id
       enable_private_path_for_google_cloud_services = true
     }
   }
+}
+
+# Deploy a postgres Read Replica db instance
+resource "google_sql_database_instance" "read_replica" {
+  name                 = "postgres-db-test-app-${var.project_name}-rreplica"
+  master_instance_name = google_sql_database_instance.gcp_sql_postgres.name
+  region               = var.gcp_region
+  database_version     = var.gcp_pg_database_version
+
+  replica_configuration {
+    failover_target = false
+  }
+
+  settings {
+    tier              = var.gcp_pg_tier
+    availability_type = "REGIONAL"
+    disk_size         = "25"
+  }
+  deletion_protection = false
 }
 
 resource "google_sql_user" "user" {
