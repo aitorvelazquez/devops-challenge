@@ -7,7 +7,7 @@ data "terraform_remote_state" "tf_state" {
   }
 }
 
-# Create a Artifact Registry to store our app image
+# Create a Artifact Registry to store our app images. Must be created before hand to build/push images.
 resource "google_artifact_registry_repository" "devops-challenge" {
   location      = var.gcp_region
   repository_id = var.project_name
