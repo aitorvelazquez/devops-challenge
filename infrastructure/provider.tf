@@ -5,7 +5,7 @@ terraform {
     # Cloud Run support was added on 3.3.0
     # google = ">= 3.3"
     google = {
-      source = "hashicorp/google"
+      source  = "hashicorp/google"
       version = "4.59.0"
     }
   }

@@ -20,7 +20,7 @@ resource "google_compute_network" "vpc_devops-challenge" {
 # Create a Artifact Registry to store our app image
 resource "google_artifact_registry_repository" "devops-challenge" {
   location      = var.gcp_region
-  repository_id = "${var.project_name}"
+  repository_id = var.project_name
   description   = "Artifact Repository for ${var.project_name}"
   format        = "DOCKER"
 }
@@ -112,9 +112,9 @@ resource "google_cloud_run_service" "test-app-devops-challenge" {
 
   # Waits for the Cloud Run API, Postgres Instance and VPC Connector to be enabled
   depends_on = [google_project_service.enable_run_api,
-                google_sql_database_instance.gcp_sql_postgres,
-                module.serverless-connector,
-                google_artifact_registry_repository.devops-challenge]
+    google_sql_database_instance.gcp_sql_postgres,
+    module.serverless-connector,
+  google_artifact_registry_repository.devops-challenge]
 }
 
 
