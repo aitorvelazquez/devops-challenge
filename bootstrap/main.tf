@@ -31,7 +31,7 @@ resource "google_service_account" "devops-challenge_sa" {
 }
 
 resource "google_project_iam_member" "sa_role_binding" {
-  project = var.project_id
+  project = var.gcp_project_id
   role    = "roles/artifactregistry.admin"
   member  = "serviceAccount:${google_service_account.devops-challenge_sa.email}"
 }
