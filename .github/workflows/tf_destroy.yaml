@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  TF_ACTIONS_WORKING_DIR: infrastructure
+  TF_ACTIONS_WORKING_DIR: bootstrap
 
 jobs:
   terraform:
