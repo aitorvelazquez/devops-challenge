@@ -12,3 +12,8 @@ variable "gcp_project_id" {
   type    = string
   default = "inbound-descent-382406"
 }
+
+variable "gh_user_repo" {
+  type    = string
+  default = "aitorvelazquez/devops-challenge"
+}
