@@ -1,6 +1,8 @@
 name: 'Terraform infrastructure bootstrap'
 
 on:
+  workflow_dispatch:
+  
   push:
     branches:
     - main
@@ -9,7 +11,9 @@ on:
   pull_request:
     paths:
     - bootstrap/**
-
+env:
+  TF_ACTIONS_WORKING_DIR: bootstrap
+  
 jobs:
   terraform:
     name: 'Terraform actions'
