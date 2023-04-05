@@ -119,7 +119,7 @@ resource "google_cloud_run_service" "test-app-devops-challenge" {
 
 
 # Deploy a postgres Master db instance
-resource "google_sql_database_instance" "gcp_sql_postgres" {
+resource "google_sql_database_instance" "master_replica" {
   provider            = google
   project             = var.gcp_project_id
   name                = "postgres-db-test-app-${var.project_name}-master"
@@ -156,6 +156,11 @@ resource "google_sql_database_instance" "read_replica" {
     tier              = var.gcp_pg_tier
     availability_type = "REGIONAL"
     disk_size         = "25"
+    ip_configuration {
+      ipv4_enabled                                  = false
+      private_network                               = google_compute_network.vpc_devops-challenge.id
+      enable_private_path_for_google_cloud_services = true
+    }
   }
 }
 
