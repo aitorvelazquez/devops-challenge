@@ -92,7 +92,7 @@ resource "google_cloud_run_service" "test-app-devops-challenge" {
         # Environment variables to define Database details
         env {
           name  = "POSTGRESQL_HOST"
-          value = google_sql_database_instance.gcp_sql_postgres.private_ip_address
+          value = google_sql_database_instance.master_replica.private_ip_address
         }
         env {
           name  = "POSTGRESQL_USER"
