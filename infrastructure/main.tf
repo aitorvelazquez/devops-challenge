@@ -143,7 +143,7 @@ resource "google_sql_database_instance" "master_replica" {
 # Deploy a postgres Read Replica db instance
 resource "google_sql_database_instance" "read_replica" {
   name                 = "postgres-db-test-app-${var.project_name}-rreplica"
-  master_instance_name = google_sql_database_instance.gcp_sql_postgres.name
+  master_instance_name = google_sql_database_instance.master_replica.name
   region               = var.gcp_region
   database_version     = var.gcp_pg_database_version
   deletion_protection  = "false"
@@ -166,7 +166,7 @@ resource "google_sql_database_instance" "read_replica" {
 
 resource "google_sql_user" "user" {
   name     = "db-test-app-user"
-  instance = google_sql_database_instance.gcp_sql_postgres.name
+  instance = google_sql_database_instance.master_replica.name
   password = "devopschallenge-042023"
 }
 
