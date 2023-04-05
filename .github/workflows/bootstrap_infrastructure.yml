@@ -1,8 +1,12 @@
+# This workflow resolves the pre-requisites to be able to run the {main} workflow used to:
+## - Build the docker image
+## - Push the image to the Google Artifact Repository
+## - Build the infrastructure where the app and its relates resources will be running
+## - Deploy the app
+
 name: 'Terraform infrastructure bootstrap'
 
-on:
-  workflow_dispatch:
-  
+on:  
   push:
     branches:
     - main
