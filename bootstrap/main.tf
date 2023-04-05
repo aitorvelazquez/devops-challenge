@@ -41,7 +41,7 @@ resource "google_project_iam_member" "sa_role_binding" {
 module "gh_oidc" {
   source      = "terraform-google-modules/github-actions-runners/google//modules/gh-oidc"
   project_id  = var.gcp_project_id
-  pool_id     = "devops-challenge-pool"
+  pool_id     = "my-pool"
   provider_id = "devops-challenge-gh-provider"
   sa_mapping = {
     (google_service_account.devops-challenge_sa.account_id) = {
