@@ -1,4 +1,4 @@
-name: Build & Push container to GAR & Run Terraform
+name: 'Build & Push container to GAR & Run Terraform'
 
 on:
   push:
