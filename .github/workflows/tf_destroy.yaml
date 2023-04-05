@@ -54,7 +54,7 @@ jobs:
       # See the documentation on "strict" required status checks for more information: 
       # https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
     - name: Terraform Apply
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push' && comment.body.includes('destroyAllInfra')
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push' && "contains(github.event.commits[0].message, '[destroyAllInfra]')"
       run: terraform destroy -auto-approve
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
