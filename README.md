@@ -87,3 +87,10 @@ In terms of security, I would apply the following improvements:
 - Use dedicated Service Accounts/ Workload Identity Providers/ Tokens and restrict the roles assigned as much as possible using IAM
 - Require authentication/authorization for all internet exposed services
 - Use secrets when possible instead of plain-text password. A very bad practive can be found here: `infrastructure/main.tf#170` (only used due time restriction and simplicity)
+
+# Improvements - WIP
+
+- To use Terraform workspaces to be able to separate different environments, such as: dev, test, prod.
+- To use the CloudRun V2 terraform resource
+- To avoid to use user and password for the database credentials
+- 
