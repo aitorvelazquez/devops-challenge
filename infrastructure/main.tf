@@ -27,23 +27,23 @@ resource "google_compute_network" "vpc_devops-challenge" {
 }
 
 # # Create a private IP address 
-# resource "google_compute_global_address" "private_ip_address" {
-#   provider      = google
-#   project       = var.gcp_project_id
-#   name          = "private-ip-address-${var.project_name}"
-#   purpose       = "VPC_PEERING"
-#   address_type  = "INTERNAL"
-#   prefix_length = 16
-#   network       = google_compute_network.vpc_devops-challenge.id
-# }
+resource "google_compute_global_address" "private_ip_address" {
+  provider      = google
+  project       = var.gcp_project_id
+  name          = "private-ip-address-${var.project_name}"
+  purpose       = "VPC_PEERING"
+  address_type  = "INTERNAL"
+  prefix_length = 16
+  network       = google_compute_network.vpc_devops-challenge.id
+}
 
-# Create a private connection
-# resource "google_service_networking_connection" "private_vpc_connection" {
-#   provider                = google
-#   network                 = google_compute_network.vpc_devops-challenge.id
-#   service                 = "servicenetworking.googleapis.com"
-#   reserved_peering_ranges = [google_compute_global_address.private_ip_address.name]
-# }
+#Create a private connection
+resource "google_service_networking_connection" "private_vpc_connection" {
+  provider                = google
+  network                 = google_compute_network.vpc_devops-challenge.id
+  service                 = "servicenetworking.googleapis.com"
+  reserved_peering_ranges = [google_compute_global_address.private_ip_address.name]
+}
 
 # Create a subnet within the VPC
 resource "google_compute_subnetwork" "vpc-subnet" {
@@ -126,7 +126,7 @@ resource "google_sql_database_instance" "gcp_sql_postgres" {
   region              = var.gcp_region
   database_version    = var.gcp_pg_database_version
   deletion_protection = "false"
-  # depends_on          = [google_service_networking_connection.private_vpc_connection]
+  depends_on          = [google_service_networking_connection.private_vpc_connection]
 
   settings {
     tier              = var.gcp_pg_tier
