@@ -92,7 +92,7 @@ resource "google_cloud_run_service" "test-app-devops-challenge" {
         # Environment variables to define Database details
         env {
           name  = "POSTGRESQL_HOST"
-          value = google_sql_database_instance.master_replica.private_ip_address
+          value = google_sql_database_instance.gcp_sql_postgres.private_ip_address
         }
         env {
           name  = "POSTGRESQL_USER"
@@ -113,13 +113,13 @@ resource "google_cloud_run_service" "test-app-devops-challenge" {
 
   # Waits for the Cloud Run API, Postgres Instance and VPC Connector to be enabled
   depends_on = [google_project_service.enable_run_api,
-    google_sql_database_instance.master_replica,
+    google_sql_database_instance.gcp_sql_postgres,
   module.serverless-connector]
 }
 
 
 # Deploy a postgres Master db instance
-resource "google_sql_database_instance" "master_replica" {
+resource "google_sql_database_instance" "gcp_sql_postgres" {
   provider            = google
   project             = var.gcp_project_id
   name                = "postgres-db-test-app-${var.project_name}-master"
@@ -143,7 +143,7 @@ resource "google_sql_database_instance" "master_replica" {
 # Deploy a postgres Read Replica db instance
 resource "google_sql_database_instance" "read_replica" {
   name                 = "postgres-db-test-app-${var.project_name}-rreplica"
-  master_instance_name = google_sql_database_instance.master_replica.name
+  master_instance_name = google_sql_database_instance.gcp_sql_postgres.name
   region               = var.gcp_region
   database_version     = var.gcp_pg_database_version
   deletion_protection  = "false"
@@ -166,7 +166,7 @@ resource "google_sql_database_instance" "read_replica" {
 
 resource "google_sql_user" "user" {
   name     = "db-test-app-user"
-  instance = google_sql_database_instance.master_replica.name
+  instance = google_sql_database_instance.gcp_sql_postgres.name
   password = "devopschallenge-042023"
 }
 

@@ -9,7 +9,12 @@ Source code repository to store the code for DevOps Challenges
   - Docker
   - Terraform
 - The project is ready to be built and deployed (CI/CD) with GitHub Actions. Secrets required:
-  - GCP__
+  - GOOGLE_CREDENTIALS: your GCP credential json file content
+  - TF_API_TOKEN: Terraform Cloud API token to be able to run Terraform from GitHub Actions Workflows
+  - WIF_PROVIDER: Workload Identity Provider name. Required to authenticate Provided as an output once the bootstrap resources have been created.
+  - WIF_SERVICE_ACCOUNT: GCP Service Account linked to the WIF PROVIDER
+
+
 # Architecture diagram
 
 <https://lucid.app/lucidchart/217ae8d6-437a-4a32-bd7a-81e62da7dd44/edit?viewport_loc=-32%2C-60%2C2219%2C1101%2C0_0&invitationId=inv_812e4acf-25ff-46f5-8953-98aef5eb8f20>
