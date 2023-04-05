@@ -1,5 +1,5 @@
 # Store the tf_state in GCS bucket
-data "terraform_remote_state" "foo" {
+data "terraform_remote_state" "tf_state" {
   backend = "gcs"
   config = {
     bucket = "tf-state-devops-challenge"
