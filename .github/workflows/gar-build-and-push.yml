@@ -52,7 +52,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: ${{ env.TF_ACTIONS_WORKING_DIR }
+        working-directory: ${{ env.TF_ACTIONS_WORKING_DIR }}
     steps:
     # Checkout the repository to the GitHub Actions runner
     - name: Checkout
