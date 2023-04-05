@@ -33,15 +33,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Google Auth
-        id: auth
-        uses: 'google-github-actions/auth@v0'
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v1'
         with:
-          token_format: 'access_token'
-          workload_identity_provider: '${{ secrets.WIF_PROVIDER }}' 
-          service_account: '${{ secrets.WIF_SERVICE_ACCOUNT }}'
+          credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
 
       - name: Docker Auth
         id: docker-auth
@@ -63,7 +61,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: ${{ env.TF_ACTIONS_WORKING_DIR }}
+        working-directory: '${{ env.TF_ACTIONS_WORKING_DIR }}'
     steps:
     # Checkout the repository to the GitHub Actions runner
     - name: Checkout
@@ -73,7 +71,7 @@ jobs:
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
       with:
-        cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+        cli_config_credentials_token: '${{ secrets.TF_API_TOKEN }}'
         terraform_version: 1.3.7
     
     # Checks that all Terraform configuration files adhere to a canonical format
@@ -85,7 +83,7 @@ jobs:
     - name: Terraform Init
       run: terraform init
       env:
-        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        GOOGLE_CREDENTIALS: '${{ secrets.GOOGLE_CREDENTIALS }}'
         
     - name: Terraform Validate
       id: validate
@@ -96,7 +94,7 @@ jobs:
       run: terraform plan -no-color
       continue-on-error: false
       env:
-        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        GOOGLE_CREDENTIALS: '${{ secrets.GOOGLE_CREDENTIALS }}'
 
       # On push to main, build or change infrastructure according to Terraform configuration files
       # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud".
@@ -106,4 +104,4 @@ jobs:
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       run: terraform apply -auto-approve
       env:
-        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        GOOGLE_CREDENTIALS: '${{ secrets.GOOGLE_CREDENTIALS }}'
