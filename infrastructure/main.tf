@@ -114,7 +114,7 @@ resource "google_cloud_run_service" "test-app-devops-challenge" {
   # Waits for the Cloud Run API, Postgres Instance and VPC Connector to be enabled
   depends_on = [google_project_service.enable_run_api,
     google_sql_database_instance.gcp_sql_postgres,
-    module.serverless-connector]
+  module.serverless-connector]
 }
 
 
