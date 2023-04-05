@@ -3,6 +3,8 @@ name: Run a terraform destroy
 on:
   push:
     branches: [ "main" ]
+  
+  workflow_dispatch:
 
 env:
   TF_ACTIONS_WORKING_DIR: infrastructure
@@ -15,6 +17,8 @@ jobs:
       run:
         shell: bash
         working-directory: ${{ env.TF_ACTIONS_WORKING_DIR }}
+        
+    if: github.ref == 'refs/heads/terraform' && github.event_name == 'push'
     steps:
     # Checkout the repository to the GitHub Actions runner
     - name: Checkout
@@ -54,7 +58,7 @@ jobs:
       # See the documentation on "strict" required status checks for more information: 
       # https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
     - name: Terraform Apply
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push' && "contains(github.event.commits[0].message, '[destroyAllInfra]')"
+      if: "contains(github.event.commits[0].message, '[destroyAllInfra]')"
       run: terraform destroy -auto-approve
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
