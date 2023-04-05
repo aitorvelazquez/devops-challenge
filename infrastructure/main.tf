@@ -155,6 +155,7 @@ resource "google_sql_database_instance" "read_replica" {
   master_instance_name = google_sql_database_instance.gcp_sql_postgres.name
   region               = var.gcp_region
   database_version     = var.gcp_pg_database_version
+  deletion_protection  = "false"
 
   replica_configuration {
     failover_target = false
@@ -165,7 +166,6 @@ resource "google_sql_database_instance" "read_replica" {
     availability_type = "REGIONAL"
     disk_size         = "25"
   }
-  deletion_protection = false
 }
 
 resource "google_sql_user" "user" {
