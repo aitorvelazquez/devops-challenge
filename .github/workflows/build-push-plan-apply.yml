@@ -5,14 +5,14 @@ on:
     branches: [ "main" ]
     paths:
       - Dockerfile
-      - test-app
-      - infrastructure
+      - test-app/**
+      - infrastructure/**
   pull_request:
     branches: [ "main" ]
     paths:
       - Dockerfile
-      - test-app
-      - infrastructure
+      - test-app/**
+      - infrastructure/**
 
 env:
   PROJECT_ID: inbound-descent-382406
