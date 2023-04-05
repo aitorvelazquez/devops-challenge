@@ -33,7 +33,7 @@ resource "google_service_account" "devops-challenge_sa" {
 resource "google_project_iam_member" "sa_role_binding" {
   project = var.project_id
   role    = "roles/artifactregistry.admin"
-  member  = "serviceAccount:${google_service_account.sa.email}"
+  member  = "serviceAccount:${google_service_account.devops-challenge_sa.email}"
 }
 
 # Create a Workload Identity pool, configure a Workload Identity provider and Granting external identities necessary IAM roles on Service Accounts
@@ -41,8 +41,8 @@ resource "google_project_iam_member" "sa_role_binding" {
 module "gh_oidc" {
   source      = "terraform-google-modules/github-actions-runners/google//modules/gh-oidc"
   project_id  = var.gcp_project_id
-  pool_id     = "example-pool"
-  provider_id = "example-gh-provider"
+  pool_id     = "devops-challenge-pool"
+  provider_id = "devops-challenge-gh-provider"
   sa_mapping = {
     (google_service_account.devops-challenge_sa.account_id) = {
       sa_name   = google_service_account.devops-challenge_sa.name
