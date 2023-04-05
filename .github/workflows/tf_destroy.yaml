@@ -18,7 +18,7 @@ jobs:
         shell: bash
         working-directory: ${{ env.TF_ACTIONS_WORKING_DIR }}
         
-    if: github.ref == 'refs/heads/terraform' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     steps:
     # Checkout the repository to the GitHub Actions runner
     - name: Checkout
