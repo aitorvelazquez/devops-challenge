@@ -2,6 +2,6 @@
 terraform {
   backend "gcs" {
     bucket = "tf-state-devops-challenge"
-    prefix = "terraform/state"
+    prefix = "devops-challenge"
   }
 }
