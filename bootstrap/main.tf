@@ -45,7 +45,7 @@ module "gh_oidc" {
   provider_id = "example-gh-provider"
   sa_mapping = {
     (google_service_account.devops-challenge_sa.account_id) = {
-      sa_name   = google_service_account.challenge_sa.name
+      sa_name   = google_service_account.devops-challenge_sa.name
       attribute = "attribute.repository/${var.gh_user_repo}"
     }
   }
